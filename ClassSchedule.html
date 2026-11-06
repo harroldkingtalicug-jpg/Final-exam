@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class Schedule · Kaplag</title>
+  <link rel="stylesheet" href="Css/Dashboard.css">
+  <link rel="stylesheet" href="Css/Class-Sched.css">
+</head>
+<body>
+
+  <!-- Hidden checkbox that opens/closes the sidebar (used by the hamburger label) -->
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation menu">
+
+  <!-- ===== Top bar ===== -->
+  <header>
+    <label for="nav-toggle" class="menu-toggle" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </label>
+
+    <a href="dashboard.html" class="brand">
+      <img class="brand-logo" src="img/Logo.png" alt="UP Mindanao seal">
+      <span class="brand-text">
+        <strong>KAPLAG</strong>
+        <small>UP Mindanao · Student Portal</small>
+      </span>
+    </a>
+
+    <div class="header-actions">
+      <button class="icon-btn" type="button" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>
+        </svg>
+        <span class="notif-dot"></span>
+      </button>
+
+      <button class="profile-btn" type="button">
+        <span class="avatar">VK</span>
+        <span class="profile-info">
+          <span class="profile-name">Vanz Kean</span>
+          <span class="profile-id">2026-17196</span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Sidebar ===== -->
+  <nav aria-label="Main menu">
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="schedule.html" aria-current="page">Class Schedule</a></li>
+      <li><a href="grades.html">Grades</a></li>
+      <li><a href="fees.html">Fees</a></li>
+      <li><a href="prospectus.html">Prospectus</a></li>
+      <li><a href="announcements.html">Announcements</a></li>
+      <li><a href="mail.html">UP Mail</a></li>
+      <li><a href="student-info.html">Student Information</a></li>
+      <li>
+        <details>
+          <summary>More</summary>
+          <ul>
+            <li><a href="evaluations.html">Evaluations</a></li>
+            <li><a href="privacy.html">UP Privacy Notice</a></li>
+            <li><a href="housing.html">Student Housing</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+    <p><a href="login.html">Log out</a></p>
+  </nav>
+
+  <!-- ===== Main content ===== -->
+  <main>
+
+    <section aria-labelledby="greeting">
+      <h1 id="greeting">Class Schedule</h1>
+      <p>BS Computer Science · First Year · Regular · AY 2026–2027</p>
+    </section>
+
+    <section aria-labelledby="summary">
+      <h2 id="summary">Information</h2>
+      <dl>
+        <dt>Program</dt>
+        <dd>BS Computer Science (BSCS) · UP Mindanao</dd>
+        <dt>Registration</dt>
+        <dd>Regular · First Year</dd>
+        <dt>Total units</dt>
+        <dd>15 credit units (+5 non-credit: PE 1, NSTP 1)</dd>
+        <dt>Semester</dt>
+        <dd>First</dd>
+      </dl>
+    </section>
+
+    <section aria-labelledby="schedule" id="scheduleCard">
+      <h2 id="schedule">Weekly schedule</h2>
+
+      <!-- Grid / List tabs -->
+      <div role="tablist" aria-label="Schedule view">
+        <button role="tab" type="button" aria-selected="true"  data-view="grid">Grid</button>
+        <button role="tab" type="button" aria-selected="false" data-view="list">List</button>
+      </div>
+
+      <!-- Must come right after the tablist to get the "Up next" box style -->
+      <p id="upnext"></p>
+
+      <div class="toolbar">
+        <button class="btn-primary" id="exportBtn" type="button">Export CSV</button>
+      </div>
+
+      <!-- Weekly grid -->
+      <div class="grid-wrap">
+        <div class="schedule-grid" id="grid"></div>
+      </div>
+
+      <!-- List view: same layout as the Certificate of Registration -->
+      <div class="list-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class code</th><th>Subject</th><th>Section</th><th>Units</th>
+              <th>Schedule &amp; room</th><th class="num">Lab fee</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+          <tfoot id="totals"></tfoot>
+        </table>
+      </div>
+
+      <div class="legend">
+        <span><i class="lec"></i>Lecture</span>
+        <span><i class="lab"></i>Laboratory</span>
+        <span><i class="act"></i>PE / NSTP</span>
+      </div>
+
+      <!-- Last paragraph in a card gets the small "link line" style -->
+      <p>Schedule is subject to change. Verify with your academic adviser. Units in parentheses are non-credit.</p>
+    </section>
+
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer>
+    <p>University of the Philippines Mindanao · Kaplag Student Portal</p>
+    <p>&copy; 2026 UP Mindanao. All rights reserved.</p>
+  </footer>
+
+  <div id="tip"></div>
+
+<script>
+const DAYS     = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const DAY_CODE = ['M', 'T', 'W', 'TH', 'F'];
+
+const COURSES = [
+  { code: '20386', subject: 'CMSC 10', units: 3, credit: true, fee: 0, meetings: [
+      { section: 'F',    days: [1, 3], s: 14.5, e: 16,   room: 'CSM 112', type: 'lecture' } ] },
+  { code: '20390', subject: 'CMSC 18', units: 3, credit: true, fee: 300, meetings: [
+      { section: 'M-3L', days: [0],    s: 7,    e: 10,   room: 'CSM 223', type: 'lab' },
+      { section: 'M-3L',    days: [2, 4], s: 13,   e: 14,   room: 'CSM 206', type: 'lecture' } ] },
+  { code: '20392', subject: 'CMSC 3',  units: 3, credit: true, fee: 300, meetings: [
+      { section: 'N-3L', days: [4],    s: 7,    e: 10,   room: 'CSM 229', type: 'lab' },
+      { section: 'N-3L',    days: [2, 4], s: 14.5, e: 15.5, room: 'CSM 206', type: 'lecture' } ] },
+  { code: '20395', subject: 'CMSC 56', units: 3, credit: true, fee: 0, meetings: [
+      { section: 'O',    days: [2, 4], s: 16,   e: 17.5, room: 'CSM 222', type: 'lecture' } ] },
+  { code: '20652', subject: 'PE 1',    units: 2, credit: false, fee: 0, meetings: [
+      { section: 'K',    days: [2, 4], s: 10,   e: 11,   room: 'Sports Complex',     type: 'activity' } ] },
+  { code: '20661', subject: 'ETHICS 1', units: 3, credit: true, fee: 0, meetings: [
+      { section: 'C2',   days: [1, 3], s: 10,   e: 11.5, room: 'CHSS 102', type: 'lecture' } ] },
+  { code: '21034', subject: 'NSTP 1-CWTS', units: 3, credit: false, fee: 0, meetings: [
+      { section: 'UV7',  days: [0],    s: 13,   e: 16,   room: 'DHK',     type: 'activity' } ] }
+];
+
+/* One entry per class block on the grid */
+const S = [];
+COURSES.forEach(c => c.meetings.forEach(m => m.days.forEach(d =>
+  S.push({ d, code: c.code, subject: c.subject, section: m.section,
+           s: m.s, e: m.e, room: m.room, type: m.type }))));
+
+const START = 7, HOURS = 11;               /* grid runs 07:00 to 18:00 */
+const pad = n => String(n).padStart(2, '0');
+const fmt = h => pad(Math.floor(h)) + ':' + (h % 1 ? '30' : '00');
+const cap = s => s[0].toUpperCase() + s.slice(1);
+const dayStr = days => days.map(d => DAY_CODE[d]).join('');   /* [1,3] -> "TTH" */
+const typeName = t => t === 'activity' ? 'PE / NSTP' : cap(t);
+
+/* Today: Mon = 0 ... Fri = 4 (weekend = no highlight) */
+const todayIdx = (new Date().getDay() + 6) % 7;
+
+/* ---------- Weekly grid ---------- */
+let html = '<div class="hd time">TIME</div>' +
+  DAYS.map((d, i) => `<div class="hd${i === todayIdx ? ' today' : ''}">${d}</div>`).join('');
+
+html += '<div class="timecol">' + Array.from({ length: HOURS }, (_, i) =>
+  `<span style="top:${i === 0 ? '10px' : `calc(var(--h)*${i})`}">${pad(START + i)}:00</span>`).join('') + '</div>';
+
+DAYS.forEach((_, d) => {
+  const blocks = S.filter(x => x.d === d).map(x =>
+    `<div class="ev ${x.type}" style="top:calc(var(--h)*${x.s - START} + 2px);height:calc(var(--h)*${x.e - x.s} - 4px)"
+          data-t="${x.subject}" data-sec="${x.section}" data-r="${x.room}" data-s="${x.s}" data-e="${x.e}" data-ty="${x.type}">
+       <b>${x.subject}</b>
+       <small>${x.section} · ${x.room}</small>
+       <small>${fmt(x.s)} – ${fmt(x.e)}</small>
+     </div>`).join('');
+  html += `<div class="day${d === todayIdx ? ' today' : ''}">${blocks}</div>`;
+});
+document.getElementById('grid').innerHTML = html;
+
+/* ---------- List view (like the COR table) ---------- */
+document.getElementById('rows').innerHTML = COURSES.map(c => {
+  const sections = c.meetings.map(m => m.section).join('<br>');
+  const times = c.meetings.map(m =>
+    `${dayStr(m.days)} ${fmt(m.s)}–${fmt(m.e)} · ${m.room}`).join('<br>');
+  return `<tr>
+    <td>${c.code}</td>
+    <td><strong>${c.subject}</strong></td>
+    <td>${sections}</td>
+    <td>${c.credit ? c.units : '(' + c.units + ')'}</td>
+    <td>${times}</td>
+    <td class="num">${c.fee.toFixed(2)}</td>
+  </tr>`;
+}).join('');
+
+const creditUnits = COURSES.filter(c => c.credit).reduce((n, c) => n + c.units, 0);
+const nonCredit   = COURSES.filter(c => !c.credit).reduce((n, c) => n + c.units, 0);
+const totalFees   = COURSES.reduce((n, c) => n + c.fee, 0);
+document.getElementById('totals').innerHTML =
+  `<tr><td colspan="3">Total</td><td>${creditUnits} (+${nonCredit})</td><td></td>
+   <td class="num">${totalFees.toFixed(2)}</td></tr>`;
+
+/* ---------- "Up next" / "Now" box ---------- */
+(function () {
+  const now = new Date();
+  const h = now.getHours() + now.getMinutes() / 60;
+  const today = S.filter(x => x.d === todayIdx).sort((a, b) => a.s - b.s);
+  const box = document.getElementById('upnext');
+  const current = today.find(x => x.s <= h && h < x.e);
+  const next = today.find(x => x.s > h);
+  const show = (label, x) =>
+    `<strong>${label}</strong> ${x.subject} · ${fmt(x.s)}–${fmt(x.e)} · ${x.room}`;
+  box.innerHTML = current ? show('Now:', current)
+                : next    ? show('Up next:', next)
+                :           '<strong>No more classes today.</strong>';
+})();
+
+/* ---------- Grid / List tabs ---------- */
+const card = document.getElementById('scheduleCard');
+document.querySelectorAll('[role="tab"]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('[role="tab"]').forEach(t =>
+      t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+    card.classList.toggle('list-view', tab.dataset.view === 'list');
+  });
+});
+
+/* ---------- Tooltip ---------- */
+const tip = document.getElementById('tip');
+const gridEl = document.getElementById('grid');
+gridEl.addEventListener('mousemove', e => {
+  const ev = e.target.closest('.ev');
+  if (!ev) { tip.style.opacity = 0; return; }
+  tip.innerHTML = `<strong>${ev.dataset.t}</strong> (${ev.dataset.sec})<br>${ev.dataset.r}<br>` +
+    `${fmt(+ev.dataset.s)} – ${fmt(+ev.dataset.e)} · ${typeName(ev.dataset.ty)}`;
+  tip.style.left = e.clientX + 14 + 'px';
+  tip.style.top = e.clientY + 14 + 'px';
+  tip.style.opacity = 1;
+});
+gridEl.addEventListener('mouseleave', () => tip.style.opacity = 0);
+
+/* ---------- Export CSV ---------- */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const rows = [['Class Code', 'Subject', 'Section', 'Day', 'Start', 'End', 'Room', 'Type'],
+    ...[...S].sort((a, b) => a.d - b.d || a.s - b.s).map(x =>
+      [x.code, x.subject, x.section, DAYS[x.d], fmt(x.s), fmt(x.e), x.room, typeName(x.type)])];
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'class-schedule.csv';
+  a.click();
+});
+</script>
+</body>
+</html>
